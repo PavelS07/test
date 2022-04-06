@@ -3,15 +3,27 @@
 function normalize($input)
 {
 // ...
-    $pattern1 = '/\/\.\//';
-    $pattern2 = '/(\/\w+\/)(\.\.\/*)/';
-    while(preg_match($pattern1, $input) || preg_match($pattern2, $input)) {
-        $input = preg_replace($pattern1, '/', $input);
-        $input = preg_replace($pattern2, '/', $input);
-    }
+    $pattern = '/(\/\.\/)|(\/\w+\/)(\.\.\/*)/'; //объединил условием 'или' две регулярки
 
-    return '/'.trim($input,'/'); // тут можно найти вхождение substr, но торопился оставлю так
+    // 1 способ цикл, выполняется за время 3.6577639579773 на 1000000 итерациях
 
+//    while(preg_match($pattern, $input)) $input = preg_replace($pattern, '/', $input);
+//
+//    return '/'.trim($input,'/'); // тут можно найти вхождение substr, но торопился оставлю так
+
+    // 2 способ рекурсия, выполняется за время 3.9290769100189 на 1000000 итерациях
+
+//    if(preg_match($pattern, $input)) $input = preg_replace($pattern, '/', $input);
+//    else return '/'.trim($input,'/');
+//
+//    $input = normalize($input);
+//    return $input;
+
+    // 3 способ регулярка для ./, выполняется за время 2.8136131763458 на 1000000 итерациях
+    $input = preg_replace('/(\/)(\.\/)+/', '\1', $input);
+    while(preg_match('/(\/\w+\/)(\.\.\/*)/', $input)) $input = preg_replace('/(\/\w+\/)(\.\.\/*)/', '/', $input);
+
+    return '/'.trim($input,'/');
 }
 
 $input1 = "/var/./lib/../test";
