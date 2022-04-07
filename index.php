@@ -1,5 +1,3 @@
-<?php
-
 function normalize($input)
 {
 // ...
@@ -20,10 +18,26 @@ function normalize($input)
 //    return $input;
 
     // 3 способ регулярка для ./, выполняется за время 2.8136131763458 на 1000000 итерациях
-    $input = preg_replace('/(\/)(\.\/)+/', '\1', $input);
-    while(preg_match('/(\/\w+\/)(\.\.\/*)/', $input)) $input = preg_replace('/(\/\w+\/)(\.\.\/*)/', '/', $input);
+//    $input = preg_replace('/(\/)(\.\/)+/', '\1', $input);
+//    while (preg_match('/(\/\w+\/)(\.\.\/*)/', $input)) $input = preg_replace('/(\/\w+\/)(\.\.\/*)/', '/', $input);
+//
+//    return '/' . trim($input, '/');
+//
+    // 4 способ stack выполняется за время 1.8260325193405 на 1000000 итерациях (цикл for вместо foreach замедляет работу, проверил)
 
-    return '/'.trim($input,'/');
+    $elements = explode('/', $input);
+    $stack = [];
+
+    foreach ($elements as $element) {
+        if ($element == '.') continue;
+        else if ($element == '..') {
+            array_pop($stack);
+        } else {
+            array_push($stack, $element);
+        }
+    }
+
+    return implode('/', $stack);
 }
 
 $input1 = "/var/./lib/../test";
